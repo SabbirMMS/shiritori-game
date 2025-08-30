@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+[Live URL]()
 
-## Getting Started
-
-First, run the development server:
+### 1. Create Project
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm create-next-app shiritori-game
+cd shiritori-game
+npm install axios
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 2. Setup API Route (backend)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* Create `/pages/api/validate.js`
 
-## Learn More
+```js
+import axios from "axios";
 
-To learn more about Next.js, take a look at the following resources:
+export default async function handler(req, res) {
+  const { word } = req.body;
+  try {
+    const response = await axios.get(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+    );
+    res.status(200).json({ valid: true, data: response.data });
+  } catch {
+    res.status(200).json({ valid: false });
+  }
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Frontend Game Page
 
-## Deploy on Vercel
+* Create `/pages/Game.jsx`
+* Implement:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  * Two players turn system
+  * Input field
+  * Call `/api/validate` for word validation
+  * Rules: word starts with last letter, not repeated, min 4 chars
+  * Countdown with `setTimeout`
+  * Score tracking in state
+  * Show word history
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+### 4. Core Logic (simplified)
+
+```js
+const [turn, setTurn] = useState(1);
+const [words, setWords] = useState([]);
+const [scores, setScores] = useState({ p1: 0, p2: 0 });
+```
+
+* On submit:
+
+  * Validate word (API + rules)
+  * Update scores
+  * Update word history
+  * Switch turn
