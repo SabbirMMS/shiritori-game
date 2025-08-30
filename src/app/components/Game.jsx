@@ -61,7 +61,7 @@ export default function GameBoard() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold text-center">Shiritori Game</h1>
+      <h1 className="text-2xl font-bold text-center mt-64">Shiritori Game</h1>
       <p className="text-center">
         Turn: {players[turn].name} (⏳ {timer}s)
       </p>
